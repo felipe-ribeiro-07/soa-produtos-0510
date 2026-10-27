@@ -1,5 +1,7 @@
 package br.gov.cps.sp.soa_produtos.endpoint;
 
+import br.gov.cps.sp.soa_produtos.exception.ProdutoNaoEncontradoException;
+import br.gov.cps.sp.soa_produtos.exception.ValidacaoException;
 import br.gov.sp.cps.produtos_soap.model.ConsultarProdutoRequest;
 import br.gov.sp.cps.produtos_soap.model.ConsultarProdutoResponse;
 
@@ -16,6 +18,10 @@ public class ProdutoEndpoint {
     @PayloadRoot(namespace = NAMESPACE, localPart = "consultarProdutoRequest")
     @ResponsePayload
     public ConsultarProdutoResponse consultarProduto(@RequestPayload ConsultarProdutoRequest request) {
+
+        if (request.getCodigo() <= 0) {
+            throw new ValidacaoException("O código do produto deve ser maior que zero");
+        }
 
         ConsultarProdutoResponse response = new ConsultarProdutoResponse();
 
@@ -34,27 +40,20 @@ public class ProdutoEndpoint {
                 break;
             case 3:
                 response.setNome("Smartphone A15");
-                response.setDescricao("Smartphone samsung a 15 com 128 GB de armzenamento");
+                response.setDescricao("Smartphone Samsung A15 com 128 GB de armazenamento");
                 response.setMarca("Samsung");
                 response.setEstoque(130);
                 break;
-            case 4 :
-                response.setNome("Teclado mecanico");
-                response.setDescricao("teclado mecanico logtech");
-                response.setMarca("logtech");
-                response.setEstoque(130);
-                break;
+            case 4:
             case 5:
-                response.setNome("Teclado mecanico");
-                response.setDescricao("teclado mecanico logtech");
-                response.setMarca("logtech");
+                response.setNome("Teclado mecânico");
+                response.setDescricao("Teclado mecânico Logitech");
+                response.setMarca("Logitech");
                 response.setEstoque(130);
                 break;
             default:
-                response.setNome("Produto não encontrado");
-                response.setDescricao("-");
-                response.setMarca("-");
-                response.setEstoque(0);
+                throw new ProdutoNaoEncontradoException(
+                        "Produto com código " + request.getCodigo() + " não encontrado");
         }
 
         return response;
